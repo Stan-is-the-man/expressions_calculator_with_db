@@ -18,7 +18,7 @@ def calculate_execution_time_in_milliseconds(func, *args):
     return execution_time
 
 
-def data_to_db(the_action, the_result, the_total_time, all_operators):
+def data_to_db(the_action, the_result, the_total_time, the_operators):
     connection = psycopg2.connect(
         host='localhost',
         database='expressions_calculator_with_db',
@@ -39,7 +39,7 @@ def data_to_db(the_action, the_result, the_total_time, all_operators):
     cursor_object.execute("""
     INSERT INTO calculator_statistics(operands, results, execution_time,operators)
     VALUES(%s, %s, %s, %s)
-    """, (the_action, the_result, the_total_time, all_operators))
+    """, (the_action, the_result, the_total_time, the_operators))
     connection.commit()
 
 
@@ -50,10 +50,6 @@ def symbol_count(the_expression):
             count += 1
     if count <= 128:
         return True
-
-
-def operations_count(an_expression):
-    pass
 
 
 while True:
