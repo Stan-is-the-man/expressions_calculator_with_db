@@ -18,7 +18,7 @@ def calculate_execution_time_in_milliseconds(func, *args):
     return execution_time
 
 
-def data_to_db(the_action, the_result, the_total_time):
+def data_to_db(the_action, the_result, the_total_time, all_operators):
     connection = psycopg2.connect(
         host='localhost',
         database='expressions_calculator_with_db',
@@ -30,15 +30,16 @@ def data_to_db(the_action, the_result, the_total_time):
         """CREATE TABLE IF NOT EXISTS calculator_statistics (    
         operands VARCHAR(200),
         results FLOAT,   
-        execution_time FLOAT
+        execution_time FLOAT,
+        operators VARCHAR(100)
     )"""
     )
     # connection.commit()
 
     cursor_object.execute("""
-    INSERT INTO calculator_statistics(operands, results, execution_time)
-    VALUES(%s, %s, %s)
-    """, (the_action, the_result, the_total_time))
+    INSERT INTO calculator_statistics(operands, results, execution_time,operators)
+    VALUES(%s, %s, %s, %s)
+    """, (the_action, the_result, the_total_time, all_operators))
     connection.commit()
 
 
@@ -51,6 +52,10 @@ def symbol_count(the_expression):
         return True
 
 
+def operations_count(an_expression):
+    pass
+
+
 while True:
     expression = input("Enter a mathematical expression to be calculated or '!' for factorial. "
                        "Type 'exit' to quit:\n")
@@ -61,7 +66,7 @@ while True:
             the_number = int(input("Please enter just ONE INTEGER number:\n"))
             res = factorial(the_number)
             exec_time = calculate_execution_time_in_milliseconds(factorial, the_number)
-            data_to_db(the_number, res, exec_time)
+            data_to_db(the_number, res, exec_time, expression)
             print(res)
         except ValueError:
             print("The entered number should be an integer !!!\n")
@@ -72,7 +77,9 @@ while True:
             if symbol_count(expression):
                 exec_time = calculate_execution_time_in_milliseconds(eval, expression)
                 all_operands = ', '.join(re.findall(r'\d+(?:\.\d+)?', expression))
-                data_to_db(all_operands, result, exec_time)
+                all_operators = ', '.join(re.findall(r'[+\-*/^%]+', expression))
+                data_to_db(all_operands, result, exec_time, all_operators)
+
                 print(result)
             else:
                 print('Up to 128 symbols accepted, please try again')
