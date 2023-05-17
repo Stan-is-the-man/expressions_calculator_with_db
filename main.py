@@ -18,33 +18,34 @@ def calculate_execution_time_in_milliseconds(func, *args):
     return execution_time
 
 
-def data_to_db(the_operands, the_result, the_total_time, the_operators):
+def data_to_db(the_result, the_expression, the_total_time, the_operands, the_operators):
     connection = psycopg2.connect(
         host='localhost',
         database='expressions_calculator_with_db',
         user='postgres',
-        password='1123QwER'
+        password='*****'
     )
     cursor_object = connection.cursor()
     cursor_object.execute(
         """CREATE TABLE IF NOT EXISTS calculator_statistics (
-        operands VARCHAR(200),
         results FLOAT,
+        math_expression VARCHAR(130),
         execution_time FLOAT,
+        operands VARCHAR(200),     
         operators VARCHAR(100)
     )"""
     )
 
     cursor_object.execute(
-        """INSERT INTO calculator_statistics(operands, results, execution_time,operators)
-        VALUES(%s, %s, %s, %s)
-    """, (the_operands, the_result, the_total_time, the_operators))
+        """INSERT INTO calculator_statistics(results, math_expression, execution_time, operands, operators)
+        VALUES(%s, %s, %s, %s, %s)
+    """, (the_result, the_expression, the_total_time, the_operands, the_operators))
     connection.commit()
 
 
-def symbol_count(the_expression):
+def symbol_count(an_expression):
     count = 0
-    for char in the_expression:
+    for char in an_expression:
         if not char.isspace():
             count += 1
     if count <= 128:
@@ -61,7 +62,8 @@ while True:
             the_number = int(input("Please enter just ONE INTEGER number:\n"))
             res = factorial(the_number)
             exec_time = calculate_execution_time_in_milliseconds(factorial, the_number)
-            data_to_db(the_number, res, exec_time, expression)
+            factorial_expression = f"{the_number}{expression}"
+            data_to_db(res, factorial_expression, exec_time, the_number, expression)
             print(res)
         except ValueError:
             print("The entered number should be an integer !!!\n")
@@ -73,8 +75,7 @@ while True:
                 exec_time = calculate_execution_time_in_milliseconds(eval, expression)
                 all_operands = ', '.join(re.findall(r'\d+(?:\.\d+)?', expression))
                 all_operators = ', '.join(re.findall(r'[+\-*/^%]+', expression))
-                data_to_db(all_operands, result, exec_time, all_operators)
-
+                data_to_db(result, expression, exec_time, all_operands, all_operators)
                 print(result)
             else:
                 print('Up to 128 symbols accepted, please try again')
