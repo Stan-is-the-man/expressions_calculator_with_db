@@ -18,28 +18,27 @@ def calculate_execution_time_in_milliseconds(func, *args):
     return execution_time
 
 
-def data_to_db(the_action, the_result, the_total_time, the_operators):
+def data_to_db(the_operands, the_result, the_total_time, the_operators):
     connection = psycopg2.connect(
         host='localhost',
         database='expressions_calculator_with_db',
         user='postgres',
-        password='******'
+        password='1123QwER'
     )
     cursor_object = connection.cursor()
     cursor_object.execute(
-        """CREATE TABLE IF NOT EXISTS calculator_statistics (    
+        """CREATE TABLE IF NOT EXISTS calculator_statistics (
         operands VARCHAR(200),
-        results FLOAT,   
+        results FLOAT,
         execution_time FLOAT,
         operators VARCHAR(100)
     )"""
     )
-    # connection.commit()
 
-    cursor_object.execute("""
-    INSERT INTO calculator_statistics(operands, results, execution_time,operators)
-    VALUES(%s, %s, %s, %s)
-    """, (the_action, the_result, the_total_time, the_operators))
+    cursor_object.execute(
+        """INSERT INTO calculator_statistics(operands, results, execution_time,operators)
+        VALUES(%s, %s, %s, %s)
+    """, (the_operands, the_result, the_total_time, the_operators))
     connection.commit()
 
 
@@ -81,4 +80,4 @@ while True:
                 print('Up to 128 symbols accepted, please try again')
 
         except Exception as e:
-            print(f"Error in {e}")
+            print(f"Error in {e}\n")
