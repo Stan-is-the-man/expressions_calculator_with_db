@@ -23,7 +23,7 @@ def data_to_db(the_result, the_expression, the_total_time, the_operands, the_ope
         host='localhost',
         database='expressions_calculator_with_db',
         user='postgres',
-        password='*****'
+        password='1123QwER'
     )
     cursor_object = connection.cursor()
     cursor_object.execute(

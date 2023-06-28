@@ -12,5 +12,6 @@ Descriptive statistics with PANDAS:
 - Average number of times the calculator performed elementary operations
 - Some other statistics
 
-Python 3.8
+Python 3.8.8
+
 PostgresSQL
